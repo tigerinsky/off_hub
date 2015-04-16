@@ -1,0 +1,5 @@
+package tis;
+
+message UserID {
+    optional int32 id = 1;
+}

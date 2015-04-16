@@ -1,0 +1,5 @@
+package tis;
+
+message Follower {
+    optional int32 a_uid = 1;
+}

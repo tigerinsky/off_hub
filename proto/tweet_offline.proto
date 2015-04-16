@@ -1,0 +1,18 @@
+package tis;
+
+message TweetOffline {
+    optional int32 online_tid = 1;
+    optional int32 uid = 2;
+    optional string uname = 3;
+    optional string title = 4;
+    optional string content = 5;
+    optional string img = 6;
+    optional int32 industry = 7;
+    optional int64 ctime = 8;
+    optional int32 read_num = 9;
+    optional int32 forward_num = 10;
+    optional int32 dianzan_num = 11;
+    optional int32 is_essence = 12;
+    optional int32 is_sug = 13;
+    optional int32 is_del = 14;
+}
