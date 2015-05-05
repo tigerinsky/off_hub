@@ -1,0 +1,6 @@
+package tis;
+
+message TweetID {
+    optional int32 tid = 1;
+    optional string industry = 2;
+}

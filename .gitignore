@@ -1,0 +1,8 @@
+output/
+*.o
+comake.py
+*.skeleton.cpp
+*.pb.cc
+*.pb.h
+interface/*.cpp
+interface/*.h

@@ -10,7 +10,7 @@ public:
     UpdateOfflineTask() : BaseTask () {}
     virtual ~UpdateOfflineTask() {}
     TaskType get_type() const { return UPDATE_OFFLINE; }
-    bool init(const PostServiceRequest* request);
+    bool init(const void* request);
     int execute(thread_context_t* thread_context);
 private:
     int __update_offline_tweet(thread_context_t* context);

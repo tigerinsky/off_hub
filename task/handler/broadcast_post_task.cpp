@@ -12,7 +12,8 @@
 
 namespace tis {
 
-bool BroadcastPostTask::init(const PostServiceRequest* request) {
+bool BroadcastPostTask::init(const void* r) {
+    const PostServiceRequest* request = static_cast<const PostServiceRequest*>(r);
     _uid = request->uid;
     _tid = request->tid;
     _industry = request->industry;

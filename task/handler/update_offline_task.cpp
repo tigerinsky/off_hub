@@ -10,7 +10,8 @@
 
 namespace tis {
 
-bool UpdateOfflineTask::init(const PostServiceRequest* request){
+bool UpdateOfflineTask::init(const void* r){
+    const PostServiceRequest* request = static_cast<const PostServiceRequest*>(r);
     _online_tid = request->tid;
     _uid = request->uid;
     _uname = "";

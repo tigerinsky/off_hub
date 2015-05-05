@@ -97,9 +97,17 @@ static int _init_thread_context(TaskManager* m, thread_context_t** context) {
                         MysqlProxy::PREPARE_INT32       // is_del
                         );
     if (MysqlProxy::MYSQL_PREPARE_OK != ret) {
-        LOG(INFO) << ret << "!" << proxy->get_prepare_err_msg(&c->mysql.write_tweet_offline_st);
         ret = 10;
         goto fail;
+    }
+    ret = proxy->prepare("select tid, industry from ci_tweet where uid=? and ctime > ? and is_del = 0 limit 20",
+                          c->mysql.tweet_id.GetDescriptor(),
+                          &(c->mysql.get_user_recent_tweet_st),
+                          MysqlProxy::PREPARE_INT32,
+                          MysqlProxy::PREPARE_INT32);
+    if (MysqlProxy::MYSQL_PREPARE_OK != ret) {
+            ret = 12; 
+            goto fail;
     }
     ret = proxy->set_charset("utf8mb4");
     if (MysqlProxy::MYSQL_SET_CHARSET_OK != ret) {

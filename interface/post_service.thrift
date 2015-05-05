@@ -15,11 +15,6 @@ struct PostServiceRequest{
     10: string img = "",
 }
 
-struct PostServiceResponse{
-    1: i32 err_no,
-    2: string err_msg
-}
-
 enum EventType {
     FORWARD = 0, //转发
     COMMENT = 1, //评论
@@ -32,7 +27,13 @@ struct EventServiceRequest {
     2: required i32 tid,
 }
 
+struct FollowEvent {
+   1: required i32 uid,
+   2: required i32 follower_uid,
+}
+
 service PostService{
-    PostServiceResponse SendNewPost(1:PostServiceRequest request)
+    void SendNewPost(1:PostServiceRequest request)
     void SendNewEvent(1:EventServiceRequest request)
+    void FollowNewEvent(1:FollowEvent event)
 }

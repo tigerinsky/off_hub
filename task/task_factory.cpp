@@ -2,6 +2,7 @@
 #include "task_factory.h"
 #include "handler/broadcast_post_task.h"
 #include "handler/update_offline_task.h"
+#include "handler/new_follow_tweet_push_task.h"
 #include "glog/logging.h"
 
 namespace tis {
@@ -15,6 +16,9 @@ BaseTask* TaskFactory::create_task(TaskType type, int priority) {
         break;
     case UPDATE_OFFLINE:
         task = dynamic_cast<BaseTask*>(new(std::nothrow) UpdateOfflineTask);
+        break;
+    case NEW_FOLLOW_TWEET_PUSH:
+        task = dynamic_cast<BaseTask*>(new(std::nothrow) NewFollowTweetPushTask);
         break;
     default:
         LOG(WARNING) << "task factory: invalid type["<<type<<"]";

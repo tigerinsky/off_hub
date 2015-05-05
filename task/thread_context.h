@@ -4,6 +4,7 @@
 #include "mysql_proxy.h"
 #include "redis_proxy.h"
 #include "../proto/follower.pb.h"
+#include "../proto/tweet_id.pb.h"
 
 namespace tis {
 
@@ -14,6 +15,8 @@ typedef struct mysql_proxy_t {
     mysql_stmt_t get_follower_st;
     Follower follower;
     mysql_stmt_t write_tweet_offline_st;
+    mysql_stmt_t get_user_recent_tweet_st;
+    TweetID tweet_id; 
 
     mysql_proxy_t() {
         proxy = NULL;
@@ -39,6 +42,10 @@ typedef struct thread_context_t {
         if (mysql.proxy) {
             mysql.proxy->free_result(&(mysql.get_follower_st));
             mysql.proxy->free_prepare(&(mysql.get_follower_st)); 
+            mysql.proxy->free_result(&(mysql.write_tweet_offline_st));
+            mysql.proxy->free_prepare(&(mysql.write_tweet_offline_st)); 
+            mysql.proxy->free_result(&(mysql.get_user_recent_tweet_st));
+            mysql.proxy->free_prepare(&(mysql.get_user_recent_tweet_st)); 
             mysql.proxy->close();
             delete mysql.proxy;
         } 

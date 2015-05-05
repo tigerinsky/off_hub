@@ -13,7 +13,7 @@ public:
     BroadcastPostTask() : BaseTask() {}
     virtual ~BroadcastPostTask() {}
     TaskType get_type() const { return BROADCAST_POST; }
-    bool init(const PostServiceRequest* request);
+    bool init(const void* request);
     int execute(thread_context_t* thread_context);
 
 private:

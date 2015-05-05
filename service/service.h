@@ -10,21 +10,14 @@ class TaskManager;
 class PostServiceImpl : virtual public PostServiceIf {
 
 public:
-    static const int CREATE_BROADCAST_TASK_ERR = 1;
-    static const int SUBMIT_TASK_ERR = 2;
-    static const int INIT_TASK_ERR = 3;
-    static const int CREATE_HANDLEAT_TASK_ERR = 4;
-    static const int CREATE_TWEETOFFLINE_TASK_ERR = 5;
-
-public:
     PostServiceImpl() : _task_manager(NULL) {}
     virtual ~PostServiceImpl() {}
 
 public:
     void set_task_manager(TaskManager* m) { _task_manager = m; }
-    void SendNewPost(PostServiceResponse& response, 
-                     const PostServiceRequest& request);
+    void SendNewPost(const PostServiceRequest& request);
     void SendNewEvent(const EventServiceRequest& request);
+    void FollowNewEvent(const FollowEvent& event);
 
 private:
     TaskManager* _task_manager;
