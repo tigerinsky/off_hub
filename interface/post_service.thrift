@@ -32,8 +32,15 @@ struct FollowEvent {
    2: required i32 follower_uid,
 }
 
+struct SmsRequest {
+   1: required string mobile,
+   2: required string content,
+   3: required i32 send_time=0,
+}
+
 service PostService{
-    void SendNewPost(1:PostServiceRequest request)
-    void SendNewEvent(1:EventServiceRequest request)
-    void FollowNewEvent(1:FollowEvent event)
+    void SendNewPost(1:PostServiceRequest request),
+    void SendNewEvent(1:EventServiceRequest request),
+    void FollowNewEvent(1:FollowEvent event),
+    void SendSmsEvent(1:SmsRequest request),
 }

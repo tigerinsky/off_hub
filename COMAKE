@@ -17,7 +17,7 @@ DEP('thrift', '1.0.0')
 DEP('redis_proxy', '1.0.0')
 DEP('mysql_proxy', '1.0.0')
 
-sources = GLOB('./server/*.cpp ./task/*.cpp ./task/handler/*.cpp ./util/*.cpp ./service/*.cpp main.cpp ./interface/*.thrift ./proto/*.proto')
+sources = GLOB('./server/*.cpp ./task/*.cpp ./task/handler/*.cpp ./util/*.cpp ./service/*.cpp ./dclient/*.cpp main.cpp ./interface/*.thrift ./proto/*.proto')
 
 APP('off_hub', sources)
 

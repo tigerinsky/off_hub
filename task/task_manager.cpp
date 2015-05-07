@@ -66,7 +66,7 @@ static int _init_thread_context(TaskManager* m, thread_context_t** context) {
         ret = 6; 
         goto fail;
     }
-    ret = proxy->prepare("select a_uid from ci_user_relation where b_uid = ? and follow_type > 0",
+    ret = proxy->prepare("select a_uid from ci_user_relation where b_uid = ? and friend_type > 0",
                          c->mysql.follower.GetDescriptor(),
                          &(c->mysql.get_follower_st),
                          MysqlProxy::PREPARE_INT32);
@@ -100,7 +100,7 @@ static int _init_thread_context(TaskManager* m, thread_context_t** context) {
         ret = 10;
         goto fail;
     }
-    ret = proxy->prepare("select tid, industry from ci_tweet where uid=? and ctime > ? and is_del = 0 limit 20",
+    ret = proxy->prepare("select tid, s_catalog from ci_tweet where uid=? and ctime > ? and is_del = 0 limit 20",//TODO industry->s_catalog just let sever start up, need to fix for requirements
                           c->mysql.tweet_id.GetDescriptor(),
                           &(c->mysql.get_user_recent_tweet_st),
                           MysqlProxy::PREPARE_INT32,
@@ -114,6 +114,8 @@ static int _init_thread_context(TaskManager* m, thread_context_t** context) {
         ret = 11;
         goto fail;
     }
+
+    c->sms_client = new SmsClient(FLAGS_sms_host.c_str(), FLAGS_sms_port);
 
     *context = c;
     return 0;

@@ -18,6 +18,7 @@ public:
     void SendNewPost(const PostServiceRequest& request);
     void SendNewEvent(const EventServiceRequest& request);
     void FollowNewEvent(const FollowEvent& event);
+    void SendSmsEvent(const SmsRequest& request);
 
 private:
     TaskManager* _task_manager;

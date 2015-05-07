@@ -10,6 +10,7 @@ enum TaskType {
     BROADCAST_POST,
     UPDATE_OFFLINE,
     NEW_FOLLOW_TWEET_PUSH,
+    SEND_SMS,
 };
 
 class BaseTask{

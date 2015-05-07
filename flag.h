@@ -19,5 +19,7 @@ DECLARE_string(mysql_db);
 DECLARE_string(mysql_user);
 DECLARE_string(mysql_pwd);
 DECLARE_int32(redis_queue_size);
+DECLARE_string(sms_host);
+DECLARE_int32(sms_port);
 
 #endif

@@ -51,7 +51,7 @@ void PostServiceImpl::SendNewEvent(const EventServiceRequest& request){
 
 void PostServiceImpl::FollowNewEvent(const FollowEvent& event) {
     BaseTask *task = NULL;
-    if (task == TaskFactory::create_task(NEW_FOLLOW_TWEET_PUSH, 6)) {
+    if ((task = TaskFactory::create_task(NEW_FOLLOW_TWEET_PUSH, 6))) {
         if (!task->init(&event)) {
             TaskFactory::destroy_task(task);
             LOG(ERROR) << "Follow event: init follow new event task error, uid[" << event.uid << "] follower[" << event.follower_uid << "]";
@@ -66,6 +66,23 @@ void PostServiceImpl::FollowNewEvent(const FollowEvent& event) {
     }
 }
 
+void PostServiceImpl::SendSmsEvent(const SmsRequest& request) {
+    BaseTask *task = NULL;
+    if ((task = TaskFactory::create_task(SEND_SMS, 7))) {
+        if (!task->init(&request)) {
+            TaskFactory::destroy_task(task);
+            LOG(ERROR) << "Send sms event: init error, mobile[" << request.mobile << "] content[" << request.content << "]";
+        } else {
+            if (!_task_manager->add_task(task)) {
+                TaskFactory::destroy_task(task);
+                LOG(ERROR) << "Send sms event: add error, mobile[" << request.mobile << "] content[" << request.content << "]";
+            }
+        }
+    } else {
+        LOG(ERROR) << "Send sms event: create error, mobile[" << request.mobile << "] content[" << request.content << "]";
+    }
 }
+
+}//namespce
 
 /* vim: set expandtab ts=4 sw=4 sts=4 tw=100: */

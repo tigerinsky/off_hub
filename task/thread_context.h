@@ -5,6 +5,7 @@
 #include "redis_proxy.h"
 #include "../proto/follower.pb.h"
 #include "../proto/tweet_id.pb.h"
+#include "../dclient/sms_client.h"
 
 namespace tis {
 
@@ -29,12 +30,14 @@ typedef struct thread_context_t {
     RedisProxy* redis_proxy;
     RedisProxy* cache_redis_proxy;
     mysql_proxy_t mysql;
+    SmsClient* sms_client;
 
     thread_context_t() {
         fail_num = 0;
         task_manager = NULL;
         redis_proxy = NULL; 
         cache_redis_proxy = NULL;
+        sms_client = NULL;
     }
 
     ~thread_context_t() {
