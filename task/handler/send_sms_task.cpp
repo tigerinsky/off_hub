@@ -24,17 +24,18 @@ int SendSmsTask::execute(thread_context_t* context) {
     SmsClient *client = context->sms_client;
 
     int retry = 2;
+    int result = -1;
     for (int i = 0; i < retry; i++) {
-        int result = client->send_sms(request);
+        result = client->send_sms(request);
         if (result == 0) {
             LOG(INFO) << "send sms success, mobile[" << _mobile <<"] retry[" << i << "]";
             return 0;
         }
 
-        LOG(INFO) << "send sms  a failed, mobile[" << _mobile <<"] retry[" << i << "]";
+        LOG(INFO) << "send sms  a failed, result[" << result << "] mobile[" << _mobile <<"] retry[" << i << "]";
     }
 
-    LOG(INFO) << "send sms finally failed, mobile[" << _mobile <<"]"; 
+    LOG(INFO) << "send sms finally failed, result [" << result << "] mobile[" << _mobile <<"]"; 
     return 1;
 }
 

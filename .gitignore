@@ -6,3 +6,4 @@ comake.py
 *.pb.h
 interface/*.cpp
 interface/*.h
+Makefile

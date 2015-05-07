@@ -22,6 +22,10 @@ enum EventType {
     ZAN_CANCEL = 3, //取消点赞
 }
 
+enum SmsType {
+    SECURITY  = 0, //验证码短信
+}
+
 struct EventServiceRequest {
     1: required EventType type,
     2: required i32 tid,
@@ -36,6 +40,7 @@ struct SmsRequest {
    1: required string mobile,
    2: required string content,
    3: required i32 send_time=0,
+   4: required SmsType type=0,
 }
 
 service PostService{
