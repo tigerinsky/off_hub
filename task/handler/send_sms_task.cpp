@@ -12,6 +12,8 @@ bool SendSmsTask::init(const void* r) {
     _mobile = request->mobile;
     _content = request->content;
     _send_time = request->send_time;
+    _sid = request->sid;
+
     return true;
 }
 
@@ -20,10 +22,11 @@ int SendSmsTask::execute(thread_context_t* context) {
     request.mobile = _mobile;
     request.content = _content;
     request.send_time = _send_time;
+    request.sid = _sid;
 
     SmsClient *client = context->sms_client;
 
-    int retry = 2;
+    int retry = 2;//TODO 放到配置中去
     int result = -1;
     for (int i = 0; i < retry; i++) {
         result = client->send_sms(request);
