@@ -3,16 +3,17 @@ namespace cpp tis
 namespace py tis 
 
 struct PostServiceRequest{
-    1: i32 tid,
+    1: i64 tid,
     2: i32 uid,
-    3: i32 industry,
-    4: string title = "",
-    5: string content,
-    6: i64 ctime,
-    7: i32 parent_tid = -1,
-    8: i32 origin_tid = -1,
-    9: i32 is_essence = 0,
-    10: string img = "",
+    3: string title = "",
+    4: string content = "",
+    5: string img = "",
+    6: string tags = "",
+    7: i32 type,
+    8: string f_catalog,
+    9: string s_catalog,
+    10: i64 ctime,
+    11: i64 dtime,
 }
 
 enum EventType {
