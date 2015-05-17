@@ -42,6 +42,7 @@ struct SmsRequest {
    2: required string content,
    3: required i32 send_time=0,
    4: required SmsType type=0,
+   5: required i32 sid,
 }
 
 service PostService{
