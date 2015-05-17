@@ -21,6 +21,7 @@ private:
     string _mobile;
     string _content;
     int _send_time;
+    int _sid;
 };
 
 }
