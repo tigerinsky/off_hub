@@ -1,5 +1,9 @@
 package tis;
 
-message Follower {
+message SmallFollower {
     optional int32 a_uid = 1;
+}
+
+message BigFollower {
+    optional int32 b_uid = 1;
 }

@@ -22,8 +22,7 @@ private:
     int __new_tweet_notify();
 
     int32_t _uid;
-    int32_t _tid;
-    int32_t _industry;
+    int64_t _tid;
     std::vector<int32_t> _follower_list;
 
 };

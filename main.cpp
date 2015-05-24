@@ -31,6 +31,7 @@ DEFINE_string(mysql_pwd, "", "mysql password");
 DEFINE_int32(redis_queue_size, 10000, "redis max queue size");
 DEFINE_string(sms_host, "127.0.0.1", "sms server host");
 DEFINE_int32(sms_port, 9898, "sms server port");
+DEFINE_string(msg_queue_prefix, "msg_queue_", "msg queue prefix");
 
 
 tis::PostServer g_server;

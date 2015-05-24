@@ -58,6 +58,7 @@ static int _init_thread_context(TaskManager* m, thread_context_t** context) {
                          FLAGS_mysql_user.c_str(),
                          FLAGS_mysql_pwd.c_str());  
     if (MysqlProxy::MYSQL_CONNECT_OK != ret) {
+        LOG(INFO) << FLAGS_mysql_host.c_str() << FLAGS_mysql_port << FLAGS_mysql_user.c_str() << FLAGS_mysql_pwd.c_str();
         ret = 5; 
         goto fail;
     }
@@ -66,14 +67,52 @@ static int _init_thread_context(TaskManager* m, thread_context_t** context) {
         ret = 6; 
         goto fail;
     }
-    ret = proxy->prepare("select a_uid from ci_user_relation where b_uid = ? and friend_type > 0",
-                         c->mysql.follower.GetDescriptor(),
-                         &(c->mysql.get_follower_st),
+    // small follower
+    ret = proxy->prepare("select a_uid from ci_user_relation where b_uid = ? and a_follow_b != 0",
+                         c->mysql.small_follower.GetDescriptor(),
+                         &(c->mysql.get_small_follower_st),
                          MysqlProxy::PREPARE_INT32);
     if (MysqlProxy::MYSQL_PREPARE_OK != ret) {
+        LOG(ERROR) << "prepare small_follower error, ret=" << ret;
         ret = 7;
         goto fail;
     }
+    // big follower
+    ret = proxy->prepare("select b_uid from ci_user_relation where a_uid = ? and b_follow_a != 0",
+                        c->mysql.big_follower.GetDescriptor(),
+                        &(c->mysql.get_big_follower_st),
+                        MysqlProxy::PREPARE_INT32);
+    if (MysqlProxy::MYSQL_PREPARE_OK != ret) {
+        LOG(ERROR) << "prepare big_follower error, ret=" << ret;
+        ret = 8;
+        goto fail;
+    }
+
+    // insert online tweet
+    ret = proxy->prepare("insert into ci_tweet (tid, uid, type, f_catalog, content,"
+                        "ctime, is_del, dtime, img, s_catalog, tags) "
+                        "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        NULL,
+                        &(c->mysql.write_new_tweet_st),
+                        MysqlProxy::PREPARE_INT64,      // tid
+                        MysqlProxy::PREPARE_INT32,      // uid
+                        MysqlProxy::PREPARE_INT32,      // type
+                        MysqlProxy::PREPARE_STRING,     // f_catalog
+                        MysqlProxy::PREPARE_STRING,     // content
+                        MysqlProxy::PREPARE_INT32,      // ctime
+                        MysqlProxy::PREPARE_INT32,      // is_del
+                        MysqlProxy::PREPARE_INT32,      // dtime
+                        MysqlProxy::PREPARE_STRING,     // img
+                        MysqlProxy::PREPARE_STRING,     // s_catalog
+                        MysqlProxy::PREPARE_STRING      // tags
+                        );
+    if (MysqlProxy::MYSQL_PREPARE_OK != ret) {
+        LOG(ERROR) << "prepare mysql_new_tweet error, ret=" << ret;
+        ret = 9;
+        goto fail;
+    }
+
+    // insert offline tweet
     ret = proxy->prepare("insert into ci_tweet_offline (tid, online_tid, uid, uname,"
                         "title, content, img, industry, ctime, comment_num, forward_num, "
                         "dianzan_num, is_essence, is_sug, is_del) "
@@ -103,7 +142,7 @@ static int _init_thread_context(TaskManager* m, thread_context_t** context) {
     ret = proxy->prepare("select tid, s_catalog from ci_tweet where uid=? and ctime > ? and is_del = 0 limit 20",//TODO industry->s_catalog just let sever start up, need to fix for requirements
                           c->mysql.tweet_id.GetDescriptor(),
                           &(c->mysql.get_user_recent_tweet_st),
-                          MysqlProxy::PREPARE_INT32,
+                          MysqlProxy::PREPARE_INT64,
                           MysqlProxy::PREPARE_INT32);
     if (MysqlProxy::MYSQL_PREPARE_OK != ret) {
             ret = 12; 

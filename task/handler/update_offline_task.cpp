@@ -11,6 +11,7 @@
 namespace tis {
 
 bool UpdateOfflineTask::init(const void* r){
+    /* TODO: later.
     const PostServiceRequest* request = static_cast<const PostServiceRequest*>(r);
     _online_tid = request->tid;
     _uid = request->uid;
@@ -21,6 +22,7 @@ bool UpdateOfflineTask::init(const void* r){
     _industry = request->industry;
     _ctime = request->ctime;
     _is_essence = request->is_essence;
+    */
 
     return true;
 }
@@ -43,6 +45,7 @@ int UpdateOfflineTask::execute(thread_context_t* thread_context){
 }
 
 int UpdateOfflineTask::__update_offline_tweet(thread_context_t* context){
+    /* TODO: later.
     int ret = -1;
 
     // 1. get user name from mysql
@@ -73,7 +76,7 @@ int UpdateOfflineTask::__update_offline_tweet(thread_context_t* context){
             << "tid[" << _online_tid << "] uid[" << _uid << "] ret[" << ret << "]";
         return 2;
     }
-
+*/
     return 0;
 }
 

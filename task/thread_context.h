@@ -14,10 +14,13 @@ class TaskManager;
 
 typedef struct mysql_proxy_t {
     MysqlProxy* proxy; 
-    mysql_stmt_t get_follower_st;
-    Follower follower;
+    mysql_stmt_t get_small_follower_st;
+    mysql_stmt_t get_big_follower_st;
+    SmallFollower small_follower;
+    BigFollower big_follower;
     mysql_stmt_t write_tweet_offline_st;
     mysql_stmt_t get_user_recent_tweet_st;
+    mysql_stmt_t write_new_tweet_st;
     TweetID tweet_id; 
 
     mysql_proxy_t() {
@@ -45,12 +48,16 @@ typedef struct thread_context_t {
     ~thread_context_t() {
         if (redis_proxy) delete redis_proxy; 
         if (mysql.proxy) {
-            mysql.proxy->free_result(&(mysql.get_follower_st));
-            mysql.proxy->free_prepare(&(mysql.get_follower_st)); 
+            mysql.proxy->free_result(&(mysql.get_small_follower_st));
+            mysql.proxy->free_prepare(&(mysql.get_small_follower_st)); 
+            mysql.proxy->free_result(&(mysql.get_big_follower_st));
+            mysql.proxy->free_prepare(&(mysql.get_big_follower_st));
             mysql.proxy->free_result(&(mysql.write_tweet_offline_st));
             mysql.proxy->free_prepare(&(mysql.write_tweet_offline_st)); 
             mysql.proxy->free_result(&(mysql.get_user_recent_tweet_st));
-            mysql.proxy->free_prepare(&(mysql.get_user_recent_tweet_st)); 
+            mysql.proxy->free_prepare(&(mysql.get_user_recent_tweet_st));
+            mysql.proxy->free_result(&(mysql.write_new_tweet_st));
+            mysql.proxy->free_prepare(&(mysql.write_new_tweet_st));
             mysql.proxy->close();
             delete mysql.proxy;
         } 

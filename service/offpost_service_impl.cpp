@@ -29,7 +29,18 @@ void PostServiceImpl::SendNewPost(const PostServiceRequest& request){
     } else {
         LOG(ERROR) << "send new post: create broadcast post task err, tid["<<request.tid<<"]";
     }
-
+    if ((task = TaskFactory::create_task(MYSQL_NEW_TWEET, 4))) {
+        if (!task->init(&request)) {
+            LOG(ERROR) << "send new post: init mysql new tweet task err, tid[" << request.tid << "]";
+            TaskFactory::destroy_task(task);
+        } else {
+            if (!_task_manager->add_task(task)) {
+                LOG(ERROR) << "send new post: add mysql new tweet task err, tid[" << request.tid << "]";
+                TaskFactory::destroy_task(task);
+            }
+        }
+    }
+/*  TODO: offline will coding later.
     if (task = TaskFactory::create_task(UPDATE_OFFLINE, 1)) {
         if (!task->init(&request)) {
             LOG(ERROR) << "send new post:init offline update task err, tid[" << request.tid << "]";
@@ -42,7 +53,7 @@ void PostServiceImpl::SendNewPost(const PostServiceRequest& request){
         }
     } else {
         LOG(ERROR) << "send new post: create offline update task err, tid["<<request.tid<<"]";
-    }
+    }*/
 }
 
 void PostServiceImpl::SendNewEvent(const EventServiceRequest& request){

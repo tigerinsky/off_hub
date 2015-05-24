@@ -11,13 +11,13 @@ enum TaskType {
     UPDATE_OFFLINE,
     NEW_FOLLOW_TWEET_PUSH,
     SEND_SMS,
-
     SEND_SYS_MSG,
     SET_MSG_READ,
     SET_MSG_DELETE,
     CLEAR_RED,
     MIS_PUSH,
     SET_PUSH_TAG
+    MYSQL_NEW_TWEET,
 };
 
 class BaseTask{
