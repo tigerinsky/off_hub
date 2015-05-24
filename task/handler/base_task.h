@@ -16,7 +16,7 @@ enum TaskType {
     SET_MSG_DELETE,
     CLEAR_RED,
     MIS_PUSH,
-    SET_PUSH_TAG
+    SET_PUSH_TAG,
     MYSQL_NEW_TWEET,
 };
 

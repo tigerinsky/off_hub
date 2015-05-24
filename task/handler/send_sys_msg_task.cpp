@@ -8,9 +8,9 @@
 
 namespace tis {
 bool SendSysMsgTask::init(const void* r) {
-    const * request = static_cast<const SysMsgRequest*>(r);
+    const SysMsgRequest* request = static_cast<const SysMsgRequest*>(r);
     _from_uid = request->from_uid;
-    _mType = request->mType;
+    _action_type = request->action_type;
     _to_uid = request->to_uid;
     _content_id = request->content_id;
 
@@ -20,7 +20,7 @@ bool SendSysMsgTask::init(const void* r) {
 int SendSysMsgTask::execute(thread_context_t* context) {
     SystemMessage request;
     request.from_uid = _from_uid;
-    request.mType = _mType;
+    request.action_type = ActionType::type(_action_type);
     request.to_uid = _to_uid;
     request.content_id = _content_id;
 

@@ -3,9 +3,11 @@
 
 #include <inttypes.h>
 #include <string>
+#include <vector>
 #include "base_task.h"
 
 using std::string;
+using std::vector;
 
 namespace tis {
 

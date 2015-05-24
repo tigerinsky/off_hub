@@ -7,7 +7,7 @@ namespace tis {
     void MsClient::send_system_msg(const SystemMessage& request) {
         try {
             transport->open();
-            ret = client.send_system_msg(request);
+            client.send_system_msg(request);
         } catch (TException& tx) {
             LOG(WARNING) << "send system msg exception, msg["<<tx.what()<<"]";
         }
@@ -17,7 +17,7 @@ namespace tis {
     }
 
     int32_t MsClient::set_read(const int32_t sMsgId) {
-        ret = -1;
+        int32_t ret = -1;
         try {
             transport->open();
             ret = client.set_read(sMsgId); 
@@ -28,10 +28,12 @@ namespace tis {
         if (NULL != transport) {
             transport->close();
         }
+
+        return ret;
     }
 
     int32_t MsClient::set_delete(const int32_t sMsgId) {
-        ret = -1;
+        int32_t ret = -1;
         try {
             transport->open();
             ret = client.set_delete(sMsgId); 
@@ -46,8 +48,8 @@ namespace tis {
         return ret;
     }
 
-    int32_t clear_red_by_uid(const int32_t uid, const int32_t mType, const int32_t num, const int32_t from_uid) {
-        ret = -1;
+    int32_t MsClient::clear_red_by_uid(const int32_t uid, const int32_t mType, const int32_t num, const int32_t from_uid) {
+        int32_t ret = -1;
         try {
             transport->open();
             ret = client.clear_red_by_uid(uid, mType, num, from_uid);
@@ -62,7 +64,7 @@ namespace tis {
         return ret;
     }
 
-    void mis_notify(const MisRequest& request) {
+    void MsClient::mis_notify(const MisRequest& request) {
         try {
             transport->open();
             client.mis_notify(request);
@@ -73,12 +75,10 @@ namespace tis {
         if (NULL != transport) {
             transport->close();
         }
-
-        return ret;
     }
 
-    int32_t optag(const OpTagRequest& request) {
-        ret = -1;
+    int32_t MsClient::optag(const OpTagRequest& request) {
+        int32_t ret = -1;
         try {
             transport->open();
             ret = client.optag(request);

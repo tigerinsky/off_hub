@@ -4,7 +4,6 @@
 #include "handler/update_offline_task.h"
 #include "handler/new_follow_tweet_push_task.h"
 #include "handler/send_sms_task.h"
-<<<<<<< HEAD
 #include "handler/send_sys_msg_task.h"
 #include "handler/set_msg_read_task.h"
 #include "handler/set_msg_delete_task.h"

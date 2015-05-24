@@ -8,7 +8,7 @@
 
 namespace tis {
 bool SetPushTagTask::init(const void* r) {
-    const * request = static_cast<const SetPushTagRequest*>(r);
+    const SetPushTagRequest* request = static_cast<const SetPushTagRequest*>(r);
     _uid = request->uid;
     _xg_device_token = request->xg_device_token;
     _op = request->op;
@@ -17,7 +17,7 @@ bool SetPushTagTask::init(const void* r) {
     return true;
 }
 
-int SetMsgDeleteTask::execute(thread_context_t* context) {
+int SetPushTagTask::execute(thread_context_t* context) {
 
     OpTagRequest request;
 

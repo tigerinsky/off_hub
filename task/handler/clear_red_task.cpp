@@ -7,8 +7,8 @@
 #include "../../interface/post_service_types.h"
 
 namespace tis {
-bool SetMsgDeleteTask::init(const void* r) {
-    const * request = static_cast<const ClearRedRequest*>(r);
+bool ClearRedTask::init(const void* r) {
+    const ClearRedRequest* request = static_cast<const ClearRedRequest*>(r);
     _uid = request->uid;
     _mType = request->mType;
     _from_uid = request->from_uid;
@@ -16,7 +16,7 @@ bool SetMsgDeleteTask::init(const void* r) {
     return true;
 }
 
-int SetMsgDeleteTask::execute(thread_context_t* context) {
+int ClearRedTask::execute(thread_context_t* context) {
 
     MsClient *client = context->ms_client;
     int ret = client->clear_red_by_uid(_uid, _mType, 0, _from_uid);
