@@ -13,7 +13,7 @@
 #include "server/server.h"
 #include "mysql_proxy.h"
 
-DEFINE_int32(port, 9027, "server port");
+DEFINE_int32(port, 9029, "server port");
 DEFINE_int32(server_thread_num, 2, "non blocking server handler thread num");
 DEFINE_int32(task_thread_num, 5, "task handler thread num");
 DEFINE_string(redis_host, "127.0.0.1", "redis host");

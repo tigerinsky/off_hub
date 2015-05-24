@@ -25,6 +25,7 @@ int SendSysMsgTask::execute(thread_context_t* context) {
     request.content_id = _content_id;
 
     MsClient *client = context->ms_client;
+    LOG(INFO) << "send sys msg from_uid[" << _from_uid << "] action_type[" << ActionType::type(_action_type) << "]";
     client->send_system_msg(request);
 }
 
