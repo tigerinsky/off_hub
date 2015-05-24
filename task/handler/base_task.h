@@ -11,6 +11,7 @@ enum TaskType {
     UPDATE_OFFLINE,
     NEW_FOLLOW_TWEET_PUSH,
     SEND_SMS,
+    MYSQL_NEW_TWEET,
 };
 
 class BaseTask{

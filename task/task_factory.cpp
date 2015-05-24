@@ -4,6 +4,7 @@
 #include "handler/update_offline_task.h"
 #include "handler/new_follow_tweet_push_task.h"
 #include "handler/send_sms_task.h"
+#include "handler/mysql_new_tweet_task.h"
 #include "glog/logging.h"
 
 namespace tis {
@@ -26,6 +27,9 @@ BaseTask* TaskFactory::create_task(TaskType type, int priority) {
         LOG(INFO) << "before create task";
         task = dynamic_cast<BaseTask*>(new(std::nothrow) SendSmsTask);
         LOG(INFO) << "after create task";
+        break;
+    case MYSQL_NEW_TWEET:
+        task = dynamic_cast<BaseTask*>(new(std::nothrow) MysqlNewTweetTask);
         break;
     default:
         LOG(WARNING) << "task factory: invalid type["<<type<<"]";
