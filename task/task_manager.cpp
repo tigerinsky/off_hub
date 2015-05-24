@@ -116,6 +116,7 @@ static int _init_thread_context(TaskManager* m, thread_context_t** context) {
     }
 
     c->sms_client = new SmsClient(FLAGS_sms_host.c_str(), FLAGS_sms_port);
+    c->ms_client = new MsClient(FLAGS_ms_host.c_str(), FLAGS_ms_port);
 
     *context = c;
     return 0;

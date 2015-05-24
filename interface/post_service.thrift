@@ -87,6 +87,20 @@ struct SetPushTagRequest {
     4: required list<string> tag_list; //需要增加或者删除的tag 列表
 }
 
+struct ClearRedRequest {
+    1: required i32 uid,
+    2: required i32 mType,
+    3: required i32 from_uid=0,
+}
+
+struct SetMsgReadRequest {
+    1: required i32 msg_id,
+}
+
+struct SetMsgDelRequest {
+    1: required i32 msg_id,
+}
+
 
 service PostService{
     void SendNewPost(1:PostServiceRequest request),
@@ -94,11 +108,11 @@ service PostService{
     void FollowNewEvent(1:FollowEvent event),
     void SendSmsEvent(1:SmsRequest request),
     //下面是对接消息中心
-    i32 SendSysMsgEvent(1:SysMsgEvent event),
-    i32 SetSysMsgReadEvent(1:i32 sMsgId),
-    i32 SetSysMsgDeleteEvent(1:i32 sMsgId),
-    i32 ClearRedEvent(1:i32 uid, 2:i32 mType, 3:i32 num=0, 4:i32 from_uid=0),
-    void MisPushEvent(1:MisEvent event),
+    void SendSysMsgEvent(1:SysMsgRequest request),
+    void SetSysMsgReadEvent(1:SetMsgReadRequest sMsgId),
+    void SetSysMsgDeleteEvent(1:SetMsgDelRequest sMsgId),
+    void ClearRedEvent(1: ClearRedRequest request),
+    void MisPushEvent(1:MisPushRequest request),
 
-    i32 SetPushTagEvent(1:SetPushTagRequest)
+    void SetPushTagEvent(1:SetPushTagRequest request),
 }

@@ -20,6 +20,13 @@ public:
     void FollowNewEvent(const FollowEvent& event);
     void SendSmsEvent(const SmsRequest& request);
 
+    void SendSysMsgEvent(const SysMsgRequest& request);
+    void SetSysMsgReadEvent(const SetMsgReadRequest& request);
+    void SetSysMsgDeleteEvent(const SetMsgDelRequest& request);
+    void ClearRedEvent(const ClearRedRequest& request);
+    void MisPushEvent(const MisPushRequest& request);
+    void SetPushTagEvent(const SetPushTagRequest& request);
+
 private:
     TaskManager* _task_manager;
 };
