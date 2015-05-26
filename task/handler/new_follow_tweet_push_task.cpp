@@ -31,7 +31,7 @@ int NewFollowTweetPushTask::execute(thread_context_t* context) {
     MysqlProxy* mysql_proxy = context->mysql.proxy;
 
 
-    snprintf(_key_buff, MAX_KEY_SIZE, "%d_msg_queue", _follower_uid);
+    snprintf(_key_buff, MAX_KEY_SIZE, "%s%lld", FLAGS_msg_queue_prefix.c_str(), _follower_uid);
     ret = redis_proxy->lrange(_key_buff, 0, -1, &tid_str_queue);
     if (RedisProxy::REDIS_LRANGE_OK != ret) {
         return 1; 
@@ -63,7 +63,7 @@ int NewFollowTweetPushTask::execute(thread_context_t* context) {
                 return 3; 
             }
             if (tid_queue.end() == std::find(tid_queue.begin(), tid_queue.end(), tweet_id->tid())) {
-                snprintf(_value_buff, MAX_VALUE_SIZE, "%d|%s", tweet_id->tid(), tweet_id->industry().c_str());
+                snprintf(_value_buff, MAX_VALUE_SIZE, "%lld", tweet_id->tid());
                 recent_push_list.push_back(_value_buff);
             }
             tweet_id->Clear();

@@ -1,0 +1,7 @@
+Log file created at: 2015/05/25 19:25:10
+Running on machine: mhback1
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0525 19:25:10.256664  1146 task_factory.cpp:21] task type:9 priority: 4
+I0525 19:26:50.570080  1147 task_factory.cpp:21] task type:9 priority: 4
+I0525 19:26:50.570297  1146 task_factory.cpp:53] create set push tag task
+I0525 19:26:50.570343  1147 task_factory.cpp:53] create set push tag task

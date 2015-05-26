@@ -28,6 +28,7 @@ int SetPushTagTask::execute(thread_context_t* context) {
 
     MsClient *client = context->ms_client;
     int ret = client->optag(request);
+    LOG(INFO) << "msg[set push task] ret[" << ret << "]";
 
     return ret;
 }

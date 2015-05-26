@@ -128,12 +128,13 @@ int BroadcastPostTask::__redis_update(thread_context_t* context) {
     DLOG(INFO) << "out_value: " << out_value;
 
     // add myself
-    if (_follower_list.end() != std::find(_follower_list.begin(),
+    std::vector<int32_t>::iterator vec_itr = std::find(_follower_list.begin(),
                                         _follower_list.end(),
-                                        _uid)) {
+                                        _uid);
+    if (_follower_list.end() != vec_itr) {
         LOG(ERROR) << "The " << _uid << " followed himself!";
-    } else {
-        _follower_list.push_back(_uid);
+        _follower_list.erase(vec_itr);
+
     }
 
     // loop users

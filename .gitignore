@@ -4,6 +4,7 @@ comake.py
 *.skeleton.cpp
 *.pb.cc
 *.pb.h
+*.swp
 interface/*.cpp
 interface/*.h
 Makefile

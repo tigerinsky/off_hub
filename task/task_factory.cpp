@@ -50,7 +50,9 @@ BaseTask* TaskFactory::create_task(TaskType type, int priority) {
         task = dynamic_cast<BaseTask*>(new(std::nothrow) MisPushTask);
         break;
     case SET_PUSH_TAG:
+        LOG(INFO) << "create set push tag task";
         task = dynamic_cast<BaseTask*>(new(std::nothrow) SetPushTagTask);
+        break;
     case MYSQL_NEW_TWEET:
         task = dynamic_cast<BaseTask*>(new(std::nothrow) MysqlNewTweetTask);
         break;
