@@ -1,4 +1,0 @@
-Log file created at: 2015/05/25 18:28:42
-Running on machine: mhback1
-Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
-E0525 18:28:42.740182 32706 server.cpp:76] thrift server exception: [TNonblockingServer::serve() bind: Address already in use]

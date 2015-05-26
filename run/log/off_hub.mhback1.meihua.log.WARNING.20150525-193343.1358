@@ -1,4 +1,0 @@
-Log file created at: 2015/05/25 19:33:43
-Running on machine: mhback1
-Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
-W0525 19:33:43.414536  1362 task_manager.cpp:178] execute task error, type[9]
