@@ -8,3 +8,4 @@ comake.py
 interface/*.cpp
 interface/*.h
 Makefile
+run/
