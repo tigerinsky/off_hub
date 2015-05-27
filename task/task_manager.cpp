@@ -140,7 +140,7 @@ static int _init_thread_context(TaskManager* m, thread_context_t** context) {
         goto fail;
         */
     
-    ret = proxy->prepare("select tid, s_catalog from ci_tweet where uid=? and ctime > ? and is_del = 0 limit 20",//TODO industry->s_catalog just let sever start up, need to fix for requirements
+    ret = proxy->prepare("select tid from ci_tweet where uid=? and ctime > ? and is_del = 0 limit 20",//TODO industry->s_catalog just let sever start up, need to fix for requirements
                           c->mysql.tweet_id.GetDescriptor(),
                           &(c->mysql.get_user_recent_tweet_st),
                           MysqlProxy::PREPARE_INT64,
