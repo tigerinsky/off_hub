@@ -21,6 +21,7 @@ typedef struct mysql_proxy_t {
     mysql_stmt_t write_tweet_offline_st;
     mysql_stmt_t get_user_recent_tweet_st;
     mysql_stmt_t write_new_tweet_st;
+    mysql_stmt_t write_new_resource_st;
     TweetID tweet_id; 
 
     mysql_proxy_t() {
@@ -58,6 +59,8 @@ typedef struct thread_context_t {
             mysql.proxy->free_prepare(&(mysql.get_user_recent_tweet_st));
             mysql.proxy->free_result(&(mysql.write_new_tweet_st));
             mysql.proxy->free_prepare(&(mysql.write_new_tweet_st));
+            mysql.proxy->free_result(&(mysql.write_new_resource_st));
+            mysql.proxy->free_prepare(&(mysql.write_new_resource_st));
             mysql.proxy->close();
             delete mysql.proxy;
         } 

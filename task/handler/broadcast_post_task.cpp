@@ -15,8 +15,8 @@ namespace tis {
 
 bool BroadcastPostTask::init(const void* r) {
     const PostServiceRequest* request = static_cast<const PostServiceRequest*>(r);
-    _uid = request->uid;
-    _tid = request->tid;
+    _uid = request->tweet_info.uid;
+    _tid = request->tweet_info.tid;
 
     return true;
 }

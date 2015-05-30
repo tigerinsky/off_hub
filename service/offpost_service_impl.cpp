@@ -18,24 +18,24 @@ void PostServiceImpl::SendNewPost(const PostServiceRequest& request){
     BaseTask* task = NULL;
     if ((task = TaskFactory::create_task(BROADCAST_POST, 5))) {
         if (!task->init(&request)) {
-            LOG(ERROR) << "send new post:init broadcast post task err, tid[" << request.tid << "]";
+            LOG(ERROR) << "send new post:init broadcast post task err, tid[" << request.tweet_info.tid << "]";
             TaskFactory::destroy_task(task);
         } else {
             if (!_task_manager->add_task(task)) {
-                LOG(ERROR) << "send new post: add broadcast post task err, tid[" << request.tid << "]";
+                LOG(ERROR) << "send new post: add broadcast post task err, tid[" << request.tweet_info.tid << "]";
                 TaskFactory::destroy_task(task);
             }
         }
     } else {
-        LOG(ERROR) << "send new post: create broadcast post task err, tid["<<request.tid<<"]";
+        LOG(ERROR) << "send new post: create broadcast post task err, tid["<<request.tweet_info.tid<<"]";
     }
     if ((task = TaskFactory::create_task(MYSQL_NEW_TWEET, 4))) {
         if (!task->init(&request)) {
-            LOG(ERROR) << "send new post: init mysql new tweet task err, tid[" << request.tid << "]";
+            LOG(ERROR) << "send new post: init mysql new tweet task err, tid[" << request.tweet_info.tid << "]";
             TaskFactory::destroy_task(task);
         } else {
             if (!_task_manager->add_task(task)) {
-                LOG(ERROR) << "send new post: add mysql new tweet task err, tid[" << request.tid << "]";
+                LOG(ERROR) << "send new post: add mysql new tweet task err, tid[" << request.tweet_info.tid << "]";
                 TaskFactory::destroy_task(task);
             }
         }

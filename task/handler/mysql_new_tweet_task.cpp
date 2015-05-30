@@ -5,18 +5,14 @@
 
 namespace tis {
 
+MysqlNewTweetTask::~MysqlNewTweetTask() {
+    delete _tweet_str;
+}
+
 bool MysqlNewTweetTask::init(const void* r) {
     const PostServiceRequest* request = static_cast<const PostServiceRequest*>(r);
-    _tid = request->tid;
-    _uid = request->uid;
-    _type = request->type;
-    _f_catalog = request->f_catalog;
-    _content = request->content;
-    _ctime = request->ctime;
-    _dtime = request->dtime;
-    _img = request->img;
-    _s_catalog = request->s_catalog;
-    _tags = request->tags;
+    _tid = request->tweet_info.tid;
+    _tweet_str = new TweetStruct(request->tweet_info);
 
     return true;
 }
@@ -37,23 +33,38 @@ int MysqlNewTweetTask::__mysql_update(thread_context_t* context) {
     int i_ret = -1;
     MysqlProxy* mysql_proxy = context->mysql.proxy;
     mysql_stmt_t* new_tweet_st = &(context->mysql.write_new_tweet_st);
+    mysql_stmt_t* new_resource_st = &(context->mysql.write_new_resource_st);
+    std::vector<ResourceStruct>& res_list = _tweet_str->resources;
 
     i_ret = mysql_proxy->execute(new_tweet_st,
-                                _tid,
-                                _uid,
-                                _type,
-                                _f_catalog.c_str(),
-                                _content.c_str(),
-                                _ctime,
+                                _tweet_str->tid,
+                                _tweet_str->uid,
+                                _tweet_str->type,
+                                _tweet_str->f_catalog.c_str(),
+                                _tweet_str->content.c_str(),
+                                _tweet_str->ctime,
                                 0,
-                                _dtime,
-                                _img.c_str(),
-                                _s_catalog.c_str(),
-                                _tags.c_str());
+                                _tweet_str->dtime,
+                                _tweet_str->s_catalog.c_str(),
+                                _tweet_str->tags.c_str(),
+                                _tweet_str->resource_id.c_str());
     if (MysqlProxy::MYSQL_QUERY_OK != i_ret) {
-        LOG(ERROR) << "Insert tweet error, tid=" << _tid
-            << " uid=" << _uid << " ret=" << i_ret;
+        LOG(ERROR) << "Insert tweet error, tid=" << _tweet_str->tid
+            << " uid=" << _tweet_str->uid << " ret=" << i_ret;
         return 1;
+    }
+
+    for (std::vector<ResourceStruct>::iterator vec_itr = res_list.begin();
+            vec_itr != res_list.end(); vec_itr++) {
+        i_ret = mysql_proxy->execute(new_resource_st,
+                                vec_itr->rid,
+                                vec_itr->img.c_str(),
+                                vec_itr->description.c_str());
+        if (MysqlProxy::MYSQL_QUERY_OK != i_ret) {
+            LOG(ERROR) << "insert resource error, rid=" << vec_itr->rid
+                << " ret=" << i_ret;
+            return 2;
+        }
     }
 
     return 0;

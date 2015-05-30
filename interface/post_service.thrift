@@ -2,18 +2,29 @@ namespace php offhub
 namespace cpp tis 
 namespace py offhub
 
-struct PostServiceRequest{
+struct ResourceStruct {
+    1: i64 rid,
+    2: string description,
+    3: string img,
+}
+
+struct TweetStruct {
     1: i64 tid,
     2: i32 uid,
     3: string title = "",
     4: string content = "",
-    5: string img = "",
-    6: string tags = "",
-    7: i32 type,
-    8: string f_catalog,
-    9: string s_catalog,
-    10: i64 ctime,
-    11: i64 dtime,
+    5: string tags = "",
+    6: i32 type,
+    7: string f_catalog,
+    8: string s_catalog,
+    9: i64 ctime,
+    10: i64 dtime,
+    11: string resource_id;
+    12: list<ResourceStruct> resources,
+}
+
+struct PostServiceRequest {
+    1: TweetStruct tweet_info,
 }
 
 enum EventType {

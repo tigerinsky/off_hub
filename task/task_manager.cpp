@@ -90,7 +90,7 @@ static int _init_thread_context(TaskManager* m, thread_context_t** context) {
 
     // insert online tweet
     ret = proxy->prepare("insert into ci_tweet (tid, uid, type, f_catalog, content,"
-                        "ctime, is_del, dtime, img, s_catalog, tags) "
+                        "ctime, is_del, dtime, s_catalog, tags, resource_id) "
                         "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                         NULL,
                         &(c->mysql.write_new_tweet_st),
@@ -102,9 +102,9 @@ static int _init_thread_context(TaskManager* m, thread_context_t** context) {
                         MysqlProxy::PREPARE_INT32,      // ctime
                         MysqlProxy::PREPARE_INT32,      // is_del
                         MysqlProxy::PREPARE_INT32,      // dtime
-                        MysqlProxy::PREPARE_STRING,     // img
                         MysqlProxy::PREPARE_STRING,     // s_catalog
-                        MysqlProxy::PREPARE_STRING      // tags
+                        MysqlProxy::PREPARE_STRING,     // tags
+                        MysqlProxy::PREPARE_STRING      // resource_id
                         );
     if (MysqlProxy::MYSQL_PREPARE_OK != ret) {
         LOG(ERROR) << "prepare mysql_new_tweet error, ret=" << ret;
@@ -112,35 +112,23 @@ static int _init_thread_context(TaskManager* m, thread_context_t** context) {
         goto fail;
     }
 
-    // insert offline tweet
-    /*ret = proxy->prepare("insert into ci_tweet_offline (tid, online_tid, uid, uname,"
-                        "title, content, img, industry, ctime, comment_num, forward_num, "
-                        "dianzan_num, is_essence, is_sug, is_del) "
-                        "values (null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                        //c->mysql.tweet_offline.GetDescriptor(),
+    // insert resource info
+    ret = proxy->prepare("insert into ci_resource (rid, img, description) "
+                        "values (?, ?, ?)",
                         NULL,
-                        &(c->mysql.write_tweet_offline_st),
-                        MysqlProxy::PREPARE_INT32,      // online_tid
-                        MysqlProxy::PREPARE_INT32,      // uid
-                        MysqlProxy::PREPARE_STRING,     // uname
-                        MysqlProxy::PREPARE_STRING,     // title
-                        MysqlProxy::PREPARE_STRING,     // content
+                        &(c->mysql.write_new_resource_st),
+                        MysqlProxy::PREPARE_INT64,      // rid
                         MysqlProxy::PREPARE_STRING,     // img
-                        MysqlProxy::PREPARE_INT32,      // industry
-                        MysqlProxy::PREPARE_INT64,      // ctime
-                        MysqlProxy::PREPARE_INT32,      // comment_num
-                        MysqlProxy::PREPARE_INT32,      // forward_num
-                        MysqlProxy::PREPARE_INT32,      // dianzan_num
-                        MysqlProxy::PREPARE_INT32,      // is_essence
-                        MysqlProxy::PREPARE_INT32,      // is_sug
-                        MysqlProxy::PREPARE_INT32       // is_del
+                        MysqlProxy::PREPARE_STRING      // description
                         );
     if (MysqlProxy::MYSQL_PREPARE_OK != ret) {
+        LOG(ERROR) << "prepare mysql_new_resource error, ret=" << ret;
         ret = 10;
         goto fail;
-        */
+    }
     
-    ret = proxy->prepare("select tid from ci_tweet where uid=? and ctime > ? and is_del = 0 limit 20",//TODO industry->s_catalog just let sever start up, need to fix for requirements
+    // user recent tweet
+    ret = proxy->prepare("select tid from ci_tweet where uid=? and ctime > ? and is_del = 0 limit 5",//TODO industry->s_catalog just let sever start up, need to fix for requirements
                           c->mysql.tweet_id.GetDescriptor(),
                           &(c->mysql.get_user_recent_tweet_st),
                           MysqlProxy::PREPARE_INT64,

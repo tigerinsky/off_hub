@@ -7,14 +7,18 @@
 
 #include <inttypes.h>
 #include <string>
+#include <vector>
 #include "base_task.h"
 
 namespace tis {
 
+class TweetStruct;
+class ResourceStruct;
+
 class MysqlNewTweetTask : public BaseTask {
 public:
-    MysqlNewTweetTask() : BaseTask() {}
-    virtual ~MysqlNewTweetTask() {}
+    MysqlNewTweetTask() : BaseTask(), _tweet_str(NULL) {}
+    virtual ~MysqlNewTweetTask();
     TaskType get_type() const { return MYSQL_NEW_TWEET; }
     bool init(const void* r);
     int execute(thread_context_t* thread_context);
@@ -22,17 +26,8 @@ public:
 private:
     int __mysql_update(thread_context_t* context);
 
-    uint64_t _tid;
-    int32_t _uid;
-    int _type;
-    std::string _f_catalog;
-    std::string _content;
-    int32_t _ctime;
-    int _is_del;
-    int32_t _dtime;
-    std::string _img;
-    std::string _s_catalog;
-    std::string _tags;
+    int64_t _tid;
+    TweetStruct* _tweet_str;
 };
 
 }
