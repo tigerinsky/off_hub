@@ -21,6 +21,7 @@ struct TweetStruct {
     10: i64 dtime,
     11: string resource_id;
     12: list<ResourceStruct> resources,
+    13: string img,
 }
 
 struct PostServiceRequest {

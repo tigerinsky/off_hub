@@ -47,7 +47,8 @@ int MysqlNewTweetTask::__mysql_update(thread_context_t* context) {
                                 _tweet_str->dtime,
                                 _tweet_str->s_catalog.c_str(),
                                 _tweet_str->tags.c_str(),
-                                _tweet_str->resource_id.c_str());
+                                _tweet_str->resource_id.c_str(),
+                                _tweet_str->img.c_str());
     if (MysqlProxy::MYSQL_QUERY_OK != i_ret) {
         LOG(ERROR) << "Insert tweet error, tid=" << _tweet_str->tid
             << " uid=" << _tweet_str->uid << " ret=" << i_ret;

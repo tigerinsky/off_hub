@@ -90,8 +90,8 @@ static int _init_thread_context(TaskManager* m, thread_context_t** context) {
 
     // insert online tweet
     ret = proxy->prepare("insert into ci_tweet (tid, uid, type, f_catalog, content,"
-                        "ctime, is_del, dtime, s_catalog, tags, resource_id) "
-                        "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        "ctime, is_del, dtime, s_catalog, tags, resource_id, img) "
+                        "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                         NULL,
                         &(c->mysql.write_new_tweet_st),
                         MysqlProxy::PREPARE_INT64,      // tid
@@ -104,7 +104,8 @@ static int _init_thread_context(TaskManager* m, thread_context_t** context) {
                         MysqlProxy::PREPARE_INT32,      // dtime
                         MysqlProxy::PREPARE_STRING,     // s_catalog
                         MysqlProxy::PREPARE_STRING,     // tags
-                        MysqlProxy::PREPARE_STRING      // resource_id
+                        MysqlProxy::PREPARE_STRING,     // resource_id
+                        MysqlProxy::PREPARE_STRING      // img
                         );
     if (MysqlProxy::MYSQL_PREPARE_OK != ret) {
         LOG(ERROR) << "prepare mysql_new_tweet error, ret=" << ret;
