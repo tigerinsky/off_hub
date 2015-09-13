@@ -20,6 +20,7 @@ public:
 private:
     int32_t _uid;
     int32_t _follower_uid;
+    int32_t _timestamp;
     char _key_buff[MAX_KEY_SIZE];
     char _value_buff[MAX_VALUE_SIZE];
 };

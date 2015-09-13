@@ -2,6 +2,7 @@
 #include "../thread_context.h"
 #include "../../interface/post_service_types.h"
 #include "mysql_new_tweet_task.h"
+#include "../../util/timer.h"
 
 namespace tis {
 
@@ -19,12 +20,19 @@ bool MysqlNewTweetTask::init(const void* r) {
 
 int MysqlNewTweetTask::execute(thread_context_t* thread_context) {
     int i_ret = -1;
+    Timer timer;
 
     i_ret = __mysql_update(thread_context);
     if (0 != i_ret) {
         LOG(ERROR) << "mysql_new_tweet_task: mysql_update error, ret=" << i_ret;
         return 1;
     }
+    time_t mysql_update_time = timer.elapse();
+
+    LOG(INFO) << "mysql new tweet task: executed."
+        << " uid=" << _tweet_str->uid
+        << " tid=" << _tweet_str->tid
+        << " mysql_update_time=" << mysql_update_time;
 
     return 0;
 }
@@ -39,16 +47,21 @@ int MysqlNewTweetTask::__mysql_update(thread_context_t* context) {
     i_ret = mysql_proxy->execute(new_tweet_st,
                                 _tweet_str->tid,
                                 _tweet_str->uid,
-                                _tweet_str->type,
-                                _tweet_str->f_catalog.c_str(),
                                 _tweet_str->content.c_str(),
                                 _tweet_str->ctime,
                                 0,
                                 _tweet_str->dtime,
-                                _tweet_str->s_catalog.c_str(),
-                                _tweet_str->tags.c_str(),
                                 _tweet_str->resource_id.c_str(),
-                                _tweet_str->img.c_str());
+                                _tweet_str->score,
+                                _tweet_str->lon,
+                                _tweet_str->lat,
+                                _tweet_str->achievement_type,
+                                _tweet_str->achievement_name.c_str(),
+                                _tweet_str->current_poi_name.c_str(),
+                                _tweet_str->city_id,
+                                _tweet_str->city.c_str(),
+                                _tweet_str->province.c_str(),
+                                _tweet_str->country.c_str());
     if (MysqlProxy::MYSQL_QUERY_OK != i_ret) {
         LOG(ERROR) << "Insert tweet error, tid=" << _tweet_str->tid
             << " uid=" << _tweet_str->uid << " ret=" << i_ret;
@@ -58,9 +71,9 @@ int MysqlNewTweetTask::__mysql_update(thread_context_t* context) {
     for (std::vector<ResourceStruct>::iterator vec_itr = res_list.begin();
             vec_itr != res_list.end(); vec_itr++) {
         i_ret = mysql_proxy->execute(new_resource_st,
-                                vec_itr->rid,
-                                vec_itr->img.c_str(),
-                                vec_itr->description.c_str());
+                                    vec_itr->rid,
+                                    vec_itr->img.c_str(),
+                                    vec_itr->description.c_str());
         if (MysqlProxy::MYSQL_QUERY_OK != i_ret) {
             LOG(ERROR) << "insert resource error, rid=" << vec_itr->rid
                 << " ret=" << i_ret;

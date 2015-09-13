@@ -18,11 +18,14 @@ public:
 
 private:
     int __get_follower(thread_context_t* context);
-    int __redis_update(thread_context_t* context);
+    int __redis_update_msg_queue(thread_context_t* context);
+    int __redis_update_user_msg_queue(thread_context_t* context);
     int __new_tweet_notify();
 
     int32_t _uid;
     int64_t _tid;
+    int32_t _msg_type;
+    int64_t _timestamp;
     std::vector<int32_t> _follower_list;
 
 };

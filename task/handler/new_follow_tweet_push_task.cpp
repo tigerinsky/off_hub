@@ -16,6 +16,8 @@ bool NewFollowTweetPushTask::init(const void* e) {
     const FollowEvent* event = static_cast<const FollowEvent*>(e);
     _uid = event->uid;
     _follower_uid = event->follower_uid;
+    _timestamp = event->timestamp;
+
     return true;
 }
 
@@ -73,15 +75,25 @@ int NewFollowTweetPushTask::execute(thread_context_t* context) {
     }
     uint64_t list_len = 0;
     for (ite = recent_push_list.begin(); ite != recent_push_list.end(); ++ite) {
-        ret = redis_proxy->lpush(_key_buff, ite->c_str(), ite->size(), &list_len); 
-        if (RedisProxy::REDIS_LPUSH_OK != ret) {
-            LOG(WARNING) << "new_follow_tweet_push_task: lpush queue error"; 
+        std::string out_value;
+        std::stringstream str_stream;
+        
+        // set value, type is new_tweet : 0
+        str_stream << *ite << "|" << _uid << "|" << 0;
+        str_stream >> out_value;
+        ret = redis_proxy->zadd(_key_buff,
+                                out_value.c_str(),
+                                out_value.size(),
+                                _timestamp,
+                                NULL);
+        if (RedisProxy::REDIS_ZADD_OK != ret) {
+            LOG(WARNING) << "new_follow_tweet_push_task: zadd queue error"; 
         }
     }
     if (FLAGS_redis_queue_size < list_len) {
-        ret = redis_proxy->ltrim(_key_buff, 0, FLAGS_redis_queue_size); 
-        if (RedisProxy::REDIS_LTRIM_OK != ret) {
-            LOG(WARNING) << "new_follow_tweet_push_task ltrim error"; 
+        ret = redis_proxy->zremrangebyrank(_key_buff, 0, list_len - FLAGS_redis_queue_size, NULL); 
+        if (RedisProxy::REDIS_ZREMRANGEBYRANK_OK != ret) {
+            LOG(WARNING) << "new_follow_tweet_push_task zremrangebyrank error"; 
         }
     }
     LOG(INFO) << "new_follow_tweet_push_task: all done uid["<<_uid<<"] follower["<<_follower_uid<<"]";

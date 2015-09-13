@@ -16,44 +16,20 @@ namespace tis {
 
 void PostServiceImpl::SendNewPost(const PostServiceRequest& request){
     BaseTask* task = NULL;
-    if ((task = TaskFactory::create_task(BROADCAST_POST, 5))) {
-        if (!task->init(&request)) {
-            LOG(ERROR) << "send new post:init broadcast post task err, tid[" << request.tweet_info.tid << "]";
-            TaskFactory::destroy_task(task);
-        } else {
-            if (!_task_manager->add_task(task)) {
-                LOG(ERROR) << "send new post: add broadcast post task err, tid[" << request.tweet_info.tid << "]";
-                TaskFactory::destroy_task(task);
-            }
-        }
-    } else {
-        LOG(ERROR) << "send new post: create broadcast post task err, tid["<<request.tweet_info.tid<<"]";
+    if (!(task = TaskFactory::create_task(MYSQL_NEW_TWEET, 4))) {
+        LOG(ERROR) << "Send new post: create task MYSQL_NEW_TWEET failed.";
+        return ;
     }
-    if ((task = TaskFactory::create_task(MYSQL_NEW_TWEET, 4))) {
-        if (!task->init(&request)) {
-            LOG(ERROR) << "send new post: init mysql new tweet task err, tid[" << request.tweet_info.tid << "]";
-            TaskFactory::destroy_task(task);
-        } else {
-            if (!_task_manager->add_task(task)) {
-                LOG(ERROR) << "send new post: add mysql new tweet task err, tid[" << request.tweet_info.tid << "]";
-                TaskFactory::destroy_task(task);
-            }
-        }
+    if (!task->init(&request)) {
+        LOG(ERROR) << "send new post: init mysql new tweet task err, tid[" << request.tweet_info.tid << "]";
+        TaskFactory::destroy_task(task);
+        return ;
     }
-/*  TODO: offline will coding later.
-    if (task = TaskFactory::create_task(UPDATE_OFFLINE, 1)) {
-        if (!task->init(&request)) {
-            LOG(ERROR) << "send new post:init offline update task err, tid[" << request.tid << "]";
-            TaskFactory::destroy_task(task);
-        } else {
-            if (!_task_manager->add_task(task)) {
-                LOG(ERROR) << "send new post: add offline update task err, tid[" << request.tid << "]";
-                TaskFactory::destroy_task(task);
-            }
-        }
-    } else {
-        LOG(ERROR) << "send new post: create offline update task err, tid["<<request.tid<<"]";
-    }*/
+    if (!_task_manager->add_task(task)) {
+        LOG(ERROR) << "send new post: add mysql new tweet task err, tid[" << request.tweet_info.tid << "]";
+        TaskFactory::destroy_task(task);
+        return ;
+    }
 }
 
 void PostServiceImpl::SendNewEvent(const EventServiceRequest& request){
@@ -91,6 +67,29 @@ void PostServiceImpl::SendSmsEvent(const SmsRequest& request) {
         }
     } else {
         LOG(ERROR) << "Send sms event: create error, mobile[" << request.mobile << "] content[" << request.content << "]";
+    }
+}
+
+void PostServiceImpl::UpdateFriendQueue(const FriendMsgRequest& request) {
+    BaseTask *task = NULL;
+    if (!(task = TaskFactory::create_task(BROADCAST_POST, 5))) {
+        LOG(ERROR) << "Update friend queue: create task error."
+            << " uid[" << request.uid << "]"
+            << " tid[" << request.tid << "]";
+        return ;
+    }
+    if (!task->init(&request)) {
+        TaskFactory::destroy_task(task);
+        LOG(ERROR) << "Update friend queue: init error."
+            << " uid[" << request.uid << "]"
+            << " tid[" << request.tid << "]";
+        return ;
+    }
+    if (!_task_manager->add_task(task)) {
+        LOG(ERROR) << "Update friend queue: add task error."
+            << " uid[" << request.uid << "]"
+            << " tid[" << request.tid << "]";
+        return ;
     }
 }
 

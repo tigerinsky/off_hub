@@ -11,17 +11,21 @@ struct ResourceStruct {
 struct TweetStruct {
     1: i64 tid,
     2: i32 uid,
-    3: string title = "",
-    4: string content = "",
-    5: string tags = "",
-    6: i32 type,
-    7: string f_catalog,
-    8: string s_catalog,
-    9: i64 ctime,
-    10: i64 dtime,
-    11: string resource_id;
-    12: list<ResourceStruct> resources,
-    13: string img,
+    3: string content = "",
+    4: i64 ctime,
+    5: i64 dtime,
+    6: string resource_id,
+    7: double score,
+    8: double lon,
+    9: double lat,
+    10: i32 achievement_type,
+    11: string achievement_name,
+    12: string current_poi_name,
+    13: list<ResourceStruct> resources,
+    14: string city,
+    15: i32 city_id,
+    16: string province,
+    17: string country,
 }
 
 struct PostServiceRequest {
@@ -60,6 +64,7 @@ struct EventServiceRequest {
 struct FollowEvent {
    1: required i32 uid,
    2: required i32 follower_uid,
+   3: required i32 timestamp,
 }
 
 struct SmsRequest {
@@ -113,12 +118,19 @@ struct SetMsgDelRequest {
     1: required i32 msg_id,
 }
 
+struct FriendMsgRequest {
+    1: required i32 uid,
+    2: required i64 tid,
+    3: required i32 msg_type,       // 0: new tweet, 1: zan tweet, 2: share tweet
+    4: required i64 timestamp,
+}
 
 service PostService{
     void SendNewPost(1:PostServiceRequest request),
     void SendNewEvent(1:EventServiceRequest request),
     void FollowNewEvent(1:FollowEvent event),
     void SendSmsEvent(1:SmsRequest request),
+    void UpdateFriendQueue(1:FriendMsgRequest request),
     //下面是对接消息中心
     void SendSysMsgEvent(1:SysMsgRequest request),
     void SetSysMsgReadEvent(1:SetMsgReadRequest sMsgId),

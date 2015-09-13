@@ -19,6 +19,7 @@ public:
     void SendNewEvent(const EventServiceRequest& request);
     void FollowNewEvent(const FollowEvent& event);
     void SendSmsEvent(const SmsRequest& request);
+    void UpdateFriendQueue(const FriendMsgRequest& request);
 
     void SendSysMsgEvent(const SysMsgRequest& request);
     void SetSysMsgReadEvent(const SetMsgReadRequest& request);

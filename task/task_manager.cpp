@@ -89,23 +89,29 @@ static int _init_thread_context(TaskManager* m, thread_context_t** context) {
     }
 
     // insert online tweet
-    ret = proxy->prepare("insert into ci_tweet (tid, uid, type, f_catalog, content,"
-                        "ctime, is_del, dtime, s_catalog, tags, resource_id, img) "
-                        "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    ret = proxy->prepare("insert into ci_tweet (tid, uid, content, ctime, is_del,"
+                        "dtime, resource_id, score, lon, lat, achievement_type,"
+                        "achievement_name, current_poi_name, city_id, city, province, country) "
+                        "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                         NULL,
                         &(c->mysql.write_new_tweet_st),
                         MysqlProxy::PREPARE_INT64,      // tid
                         MysqlProxy::PREPARE_INT32,      // uid
-                        MysqlProxy::PREPARE_INT32,      // type
-                        MysqlProxy::PREPARE_STRING,     // f_catalog
                         MysqlProxy::PREPARE_STRING,     // content
                         MysqlProxy::PREPARE_INT32,      // ctime
                         MysqlProxy::PREPARE_INT32,      // is_del
                         MysqlProxy::PREPARE_INT32,      // dtime
-                        MysqlProxy::PREPARE_STRING,     // s_catalog
-                        MysqlProxy::PREPARE_STRING,     // tags
                         MysqlProxy::PREPARE_STRING,     // resource_id
-                        MysqlProxy::PREPARE_STRING      // img
+                        MysqlProxy::PREPARE_DOUBLE,     // score
+                        MysqlProxy::PREPARE_DOUBLE,     // lon
+                        MysqlProxy::PREPARE_DOUBLE,     // lat
+                        MysqlProxy::PREPARE_INT32,      // achievement_type
+                        MysqlProxy::PREPARE_STRING,     // achievement_name
+                        MysqlProxy::PREPARE_STRING,     // current_poi_name
+                        MysqlProxy::PREPARE_INT32,      // city_id
+                        MysqlProxy::PREPARE_STRING,     // city
+                        MysqlProxy::PREPARE_STRING,     // province
+                        MysqlProxy::PREPARE_STRING      // country
                         );
     if (MysqlProxy::MYSQL_PREPARE_OK != ret) {
         LOG(ERROR) << "prepare mysql_new_tweet error, ret=" << ret;

@@ -22,5 +22,6 @@ DECLARE_int32(redis_queue_size);
 DECLARE_string(sms_host);
 DECLARE_int32(sms_port);
 DECLARE_string(msg_queue_prefix);
+DECLARE_string(user_msg_queue_prefix);
 
 #endif

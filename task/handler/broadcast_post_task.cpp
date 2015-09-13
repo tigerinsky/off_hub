@@ -14,9 +14,11 @@
 namespace tis {
 
 bool BroadcastPostTask::init(const void* r) {
-    const PostServiceRequest* request = static_cast<const PostServiceRequest*>(r);
-    _uid = request->tweet_info.uid;
-    _tid = request->tweet_info.tid;
+    const FriendMsgRequest* request = static_cast<const FriendMsgRequest*>(r);
+    _uid = request->uid;
+    _tid = request->tid;
+    _msg_type = request->msg_type;
+    _timestamp = request->timestamp;
 
     return true;
 }
@@ -115,15 +117,71 @@ int BroadcastPostTask::__get_follower(thread_context_t* context) {
     return 0;
 }
 
-int BroadcastPostTask::__redis_update(thread_context_t* context) {
+int BroadcastPostTask::__redis_update_user_msg_queue(thread_context_t* context) {
     RedisProxy* redis_proxy = context->redis_proxy;
     std::stringstream str_stream;
     std::string out_value;
     std::string user_key;
+    std::string score;
     uint64_t queue_size = 0;
 
     // set value
-    str_stream << _tid;
+    // value format: tid|uid|type
+    str_stream << _tid << "|" << _uid << "|" << _msg_type;
+    str_stream >> out_value;
+    str_stream.clear();
+    str_stream << FLAGS_user_msg_queue_prefix << _uid;
+    str_stream >> user_key;
+
+    int redis_ret = redis_proxy->zscore(user_key.c_str(),
+                                        out_value.c_str(),
+                                        out_value.length(),
+                                        score);
+    redis_ret = redis_proxy->zadd(user_key.c_str(),
+                                out_value.c_str(),
+                                out_value.length(),
+                                _timestamp,
+                                NULL);
+    if (RedisProxy::REDIS_ZADD_OK != redis_ret) {
+        LOG(ERROR) << "zadd " << user_key << " failed."
+            << " value " << out_value
+            << " score " << _timestamp;
+        return 2;
+    }
+
+    redis_ret = redis_proxy->zcard(user_key.c_str(), &queue_size);
+    if (RedisProxy::REDIS_ZADD_OK != redis_ret) {
+        LOG(ERROR) << "zcard " << user_key << " failed.";
+        return 3;
+    }
+    if (FLAGS_redis_queue_size < queue_size) {
+        if (RedisProxy::REDIS_ZREMRANGEBYRANK_OK !=
+                redis_proxy->zremrangebyrank(user_key.c_str(),
+                                            FLAGS_redis_queue_size,
+                                            -1,
+                                            NULL)) {
+            LOG(ERROR) << "zremrangebyrank " << user_key
+                << " from " << FLAGS_redis_queue_size
+                << " to -1 failed.";
+        } // if RedisProxy ..
+    } // if FLAGS ..
+
+
+    return 0;
+}
+
+int BroadcastPostTask::__redis_update_msg_queue(thread_context_t* context) {
+    RedisProxy* redis_proxy = context->redis_proxy;
+    std::stringstream str_stream;
+    std::string out_value;
+    std::string user_key;
+    std::string score;
+    uint64_t queue_size = 0;
+    int redis_ret = 0;
+
+    // set value
+    // value format: tid|uid|type
+    str_stream << _tid << "|" << _uid << "|" << _msg_type;
     str_stream >> out_value;
     DLOG(INFO) << "out_value: " << out_value;
 
@@ -133,8 +191,8 @@ int BroadcastPostTask::__redis_update(thread_context_t* context) {
                                         _uid);
     if (_follower_list.end() != vec_itr) {
         LOG(ERROR) << "The " << _uid << " followed himself!";
-        _follower_list.erase(vec_itr);
-
+    } else {
+        _follower_list.push_back(_uid);
     }
 
     // loop users
@@ -144,37 +202,55 @@ int BroadcastPostTask::__redis_update(thread_context_t* context) {
         str_stream.clear();
         str_stream << FLAGS_msg_queue_prefix << *vec_itr;
         str_stream >> user_key;
-        DLOG(INFO) << "list_key: " << user_key;
-        if (RedisProxy::REDIS_LPUSH_OK !=
-                redis_proxy->lpush(user_key.c_str(), 
-                                    out_value.c_str(), 
+        DLOG(INFO) << "list_key: " << user_key
+            << " out_value: " << out_value;
+        redis_ret = redis_proxy->zadd(user_key.c_str(),
+                                    out_value.c_str(),
                                     out_value.length(),
-                                    &queue_size)){
-            LOG(ERROR) << "lpush " << user_key << " failed.";
-        } else {
-            // if queue is limit, pop out left item.
-            if (FLAGS_redis_queue_size < queue_size){
-                int32_t end_pos = FLAGS_redis_queue_size - static_cast<int32_t>(queue_size) - 1;
-                if(RedisProxy::REDIS_LTRIM_OK != 
-                        redis_proxy->ltrim(user_key.c_str(),
-                                0,
-                                end_pos)){
-                    LOG(ERROR) << "ltrim " << user_key 
-                        << " from " << queue_size - FLAGS_redis_queue_size
-                        << " to -1 failed.";
-                } // if RedisProxy ..
-            } // if FLAGS ..
-        } // else
-    }
+                                    _timestamp,
+                                    NULL);
+        if (RedisProxy::REDIS_ZADD_OK != redis_ret) {
+            LOG(ERROR) << "zadd " << user_key << "failed."
+                << "value " << out_value
+                << "score " << _timestamp;
+            continue;
+        }
 
+        redis_ret = redis_proxy->zcard(user_key.c_str(), &queue_size);
+        if (RedisProxy::REDIS_ZADD_OK != redis_ret) {
+            LOG(ERROR) << "zcard " << user_key << "failed.";
+            continue;
+        }
+        // if queue is limit, pop out left item.
+        if (FLAGS_redis_queue_size < queue_size){
+            if(RedisProxy::REDIS_ZREMRANGEBYRANK_OK != 
+                    redis_proxy->zremrangebyrank(user_key.c_str(),
+                                                FLAGS_redis_queue_size,
+                                                -1,
+                                                NULL)) {
+                LOG(ERROR) << "zremrangebyrank " << user_key 
+                    << " from " << FLAGS_redis_queue_size
+                    << " to -1 failed.";
+            } // if RedisProxy ..
+            continue;
+        } // if FLAGS ..
+    }
     return 0;
 }
 
-/*int BroadcastPostTask::__new_tweet_notify() {
+int BroadcastPostTask::__new_tweet_notify() {
     NewTweetNotifyRequest request;
+
     request.type = TweetType::COMMUNITY;
     request.tid = _tid;
-    request.uids = _follower_list;
+    //request.uids =
+    std::vector<int32_t>::iterator vec_itr =
+        std::find(_follower_list.begin(),
+                _follower_list.end(),
+                _uid);
+    if (_follower_list.end() != vec_itr) {
+        _follower_list.erase(vec_itr);
+    }
 
     using namespace apache::thrift;
     using boost::shared_ptr;
@@ -187,12 +263,12 @@ int BroadcastPostTask::__redis_update(thread_context_t* context) {
         ms.new_tweet_notify(request);
         transport->close();
     } catch (TException& tx) {
-        LOG(WARNING) << "broadcast new tweet notify exception, msg["<<tx.what()<<"]"; 
+        LOG(WARNING) << "broadcast new tweet notify exception, msg["<<tx.what()<<"]";
         return 1;
     }
 
     return 0;
-}*/
+}
 
 int BroadcastPostTask::execute(thread_context_t* context) {
     int ret = -1;
@@ -206,30 +282,40 @@ int BroadcastPostTask::execute(thread_context_t* context) {
     time_t follower_time = timer.elapse();
 
     timer.reset();
-    ret = __redis_update(context);
+    ret = __redis_update_msg_queue(context);
     if (ret) {
         LOG(ERROR) << "broadcast post task: update redis error, tid["<<_tid<<"] ret["<<ret<<"]"; 
         return 2;
     }
-    time_t update_time = timer.elapse();
+    time_t update_msg_queue_time = timer.elapse();
 
     timer.reset();
-/* TODO: new notify later.
+    ret = __redis_update_user_msg_queue(context);
+    if (ret) {
+        LOG(ERROR) << "broadcast post task: update redis user_msg_queue, "
+            << "tid[" << _tid << "] ret [" << ret << "]";
+        return 3;
+    }
+    time_t update_user_msg_queue_time = timer.elapse();
+
+    timer.reset();
     ret = __new_tweet_notify();
     if (ret) {
-        LOG(ERROR) << "broadcast post task: notify new tweet error, tid["<<_tid<<"] ret["<<ret<<"]"; 
-        return 3;
-  }*/
-    time_t new_tweet_time = timer.elapse();
+        LOG(ERROR) << "broadcast post task: new tweet notify, "
+            << "tid[" << _tid << "] ret [" << ret << "]";
+    }
+    time_t new_tweet_notify_time = timer.elapse();
 
-    LOG(INFO) << "broadcast post task: executed. _tid=" << _tid 
-        << " _uid=" << _uid
+    LOG(INFO) << "broadcast post task: executed."
+        << " uid=" << _uid
+        << " tid=" << _tid
+        << " msg_type" << _msg_type
         << " follower_time=" << follower_time 
-        << " update_time=" << update_time
-        << " new_tweet_time=" << new_tweet_time;
+        << " update_msg_queue_time=" << update_msg_queue_time
+        << " update_user_msg_queue_time=" << update_user_msg_queue_time
+        << " new_tweet_notify_time=" << new_tweet_notify_time;
 
     return 0;
 }
 
 }
-
